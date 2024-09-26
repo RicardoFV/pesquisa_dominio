@@ -1,32 +1,27 @@
-import logging, os, json
-from selenium import webdriver
+import os
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 import time
 
-# Adicionando opções ao WebDriver
-options = webdriver.ChromeOptions()
-options.add_argument("--no-sandbox")
-options.add_argument("--disable-dev-shm-usage")
-options.add_argument("--start-maximized")
+from navegador import *
+from planilha import *
 
-# Especificando o caminho do chromedriver usando o Service
-chrome_driver = Service("C://webDriver//chromedriver.exe")
+# Obtém o diretório atual
+caminho = os.path.dirname(os.path.abspath(__file__))
 
-# Inicializando o WebDriver com o service e as opções
-driver = webdriver.Chrome(service=chrome_driver, options=options)
+#cria o arquivo
+arquivo_txt = open(os.path.join(caminho, 'resultado.txt'), 'w')
+
+# ler o arquivo
+sheet = Planilha().lerPlanilha()
+
+# instancia o navegador
+driver = Navegador().abrir()
 
 # Acessando o site
 driver.get('https://registro.br/')
 
-
-#lista de dominos
-dominios = ['roboscompython.com.br', 'dominio2.com.br', 'minhaempresa.com.br']
-
-for dominio in dominios:
+for dominio in range(1,sheet.max_row + 1):
     #pesquisando no elemento
     pesquisar = driver.find_element(By.ID , 'is-avail-field')
 
@@ -34,7 +29,7 @@ for dominio in dominios:
     pesquisar.clear()
 
     # pesquisa o dominio
-    pesquisar.send_keys(dominio)
+    pesquisar.send_keys(sheet.cell(row=dominio, column=1).value)
     # Da o enter
     pesquisar.send_keys(Keys.RETURN)
     time.sleep(2)
@@ -42,9 +37,13 @@ for dominio in dominios:
     # pega o resultado 
     resultados = driver.find_element(By.XPATH , '/html/body/div/div/main/div/section/div[2]/div/p/span/strong').text
     time.sleep(2)
-    print(f"O Dominio : {dominio} esta : {resultados}")
+    #print(f"O Dominio : {dominio} esta : {resultados}")
+    texto = f"O Dominio : {dominio} esta : {resultados}\n"
+    arquivo_txt.write(texto)
 # Aguardando o carregamento da página
 time.sleep(2)
 
-# Fechando o WebDriver
-driver.close()
+#fecha o arquivo
+arquivo_txt.close()
+# fecha o navegador
+Navegador(driver).fechar()
