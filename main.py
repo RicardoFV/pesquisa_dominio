@@ -2,19 +2,22 @@ from navegador import *
 from planilha import *
 from pesquisar import *
 
+def main():
+    print("Projeto iniciado...")
 
-print("Projeto iniciado...")
+    # ler o arquivo
+    planilha = Planilha().lerPlanilha()
 
-# ler o arquivo
-planilha = Planilha().lerPlanilha()
+    # instancia o navegador
+    driver = Navegador().abrir()
 
-# instancia o navegador
-driver = Navegador().abrir()
+    # realiza a pesquisa
+    Pesquisar(driver, planilha).pesquisarDominio()
 
-# realiza a pesquisa
-Pesquisar(driver, planilha).pesquisarDominio()
+    # fecha o navegador
+    Navegador(driver).fechar()
 
-# fecha o navegador
-Navegador(driver).fechar()
+    print("Projeto finalizado...")
 
-print("Projeto finalizado...")
+if __name__ == '__main__':
+    main()
